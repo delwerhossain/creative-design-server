@@ -50,6 +50,7 @@ async function run() {
 
     //collection
     const usersCollection = client.db("creative-design").collection("users");
+    const classCollection = client.db("creative-design").collection("class");
 
     //--------------------------
     //     Verification JWT
@@ -63,7 +64,7 @@ async function run() {
 
       res.send({ token });
     });
- 
+
     // Warning: use verifyJWT before using verifyAdmin
     const verifyAdmin = async (req, res, next) => {
       const email = req.decoded.email;
@@ -98,22 +99,6 @@ async function run() {
       res.send(result);
     });
 
-    app.post("/users", async (req, res) => {
-      const user = req.body;
-      const query = { email: user.email };
-      const existingUser = await usersCollection.findOne(query);
-
-      if (existingUser) {
-        return res.send({ message: "user already exists" });
-      }
-
-      const result = await usersCollection.insertOne(user);
-      res.send(result);
-    });
-
-    // security layer: verifyJWT
-    // email same
-    // check admin
     app.get("/users/admin/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
 
@@ -151,6 +136,17 @@ async function run() {
       };
 
       const result = await usersCollection.updateOne(filter, updateDoc);
+      res.send(result);
+    });
+
+    //--------------------------
+    //        Instructor
+    //--------------------------
+
+    app.post("/create-class", verifyJWT, verifyInstructor, async (req, res) => {
+      const classDetails = req.body;
+      console.log(classDetails);
+      const result = await classCollection.insertOne(classDetails);
       res.send(result);
     });
 
