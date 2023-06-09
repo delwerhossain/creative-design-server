@@ -144,14 +144,7 @@ async function run() {
     //        Instructor
     //--------------------------
 
-    app.post("/create-class", verifyJWT, verifyInstructor, async (req, res) => {
-      const classDetails = req.body;
-      console.log(classDetails);
-      const result = await classCollection.insertOne(classDetails);
-      res.send(result);
-    });
-
-    //instructor
+    //instructor verification for dashboard
     app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
 
@@ -164,6 +157,23 @@ async function run() {
       const result = { instructor: user?.role === "instructor" };
       res.send(result);
     });
+
+    app.post("/create-class", verifyJWT, verifyInstructor, async (req, res) => {
+      const classDetails = req.body;
+      console.log(classDetails);
+      const result = await classCollection.insertOne(classDetails);
+      res.send(result);
+    });
+    app.get("/create-class", verifyJWT, verifyInstructor, async (req, res) => {
+      const email = req.body.instructorEmail;
+      const query = { instructorEmail : email };
+      const result = await classCollection.find(query).toArray;
+      res.send(result);
+    });
+
+    //--------------------------
+    //        api ends 
+    //--------------------------
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
