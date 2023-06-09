@@ -164,15 +164,21 @@ async function run() {
       const result = await classCollection.insertOne(classDetails);
       res.send(result);
     });
-    app.get("/create-class", verifyJWT, verifyInstructor, async (req, res) => {
-      const email = req.body.instructorEmail;
-      const query = { instructorEmail : email };
-      const result = await classCollection.find(query).toArray;
-      res.send(result);
-    });
+    app.get(
+      "/instructor-class",
+      verifyJWT,
+      verifyInstructor,
+      async (req, res) => {
+        const email = req.decoded.email;
+        console.log(email);
+        const query = { instructorEmail: email };
+        const result = await classCollection.find(query).toArray();
+        res.send(result);
+      }
+    );
 
     //--------------------------
-    //        api ends 
+    //        api ends
     //--------------------------
 
     // Send a ping to confirm a successful connection
