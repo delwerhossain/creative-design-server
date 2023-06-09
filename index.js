@@ -125,19 +125,6 @@ async function run() {
       const result = { admin: user?.role === "admin" };
       res.send(result);
     });
-    //instructor
-    app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
-      const email = req.params.email;
-
-      if (req.decoded.email !== email) {
-        res.send({ instructor: false });
-      }
-
-      const query = { email: email };
-      const user = await usersCollection.findOne(query);
-      const result = { instructor: user?.role === "instructor" };
-      res.send(result);
-    });
 
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
@@ -161,6 +148,20 @@ async function run() {
       const classDetails = req.body;
       console.log(classDetails);
       const result = await classCollection.insertOne(classDetails);
+      res.send(result);
+    });
+
+    //instructor
+    app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
+      const email = req.params.email;
+
+      if (req.decoded.email !== email) {
+        res.send({ instructor: false });
+      }
+
+      const query = { email: email };
+      const user = await usersCollection.findOne(query);
+      const result = { instructor: user?.role === "instructor" };
       res.send(result);
     });
 
