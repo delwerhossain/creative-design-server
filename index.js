@@ -128,7 +128,6 @@ async function run() {
 
     app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const filter = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
@@ -160,7 +159,6 @@ async function run() {
 
     app.post("/create-class", verifyJWT, verifyInstructor, async (req, res) => {
       const classDetails = req.body;
-      console.log(classDetails);
       const result = await classCollection.insertOne(classDetails);
       res.send(result);
     });
@@ -175,7 +173,6 @@ async function run() {
         res.send(result);
       }
     );
-
     //--------------------------
     //    public api all class
     //--------------------------
@@ -193,7 +190,6 @@ async function run() {
       }
       const query = { status: "accept" };
       const result = await classCollection.find(query).toArray();
-      console.log({ result, userCheck });
       res.send({ result, userCheck });
     });
 
