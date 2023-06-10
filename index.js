@@ -184,13 +184,25 @@ async function run() {
       let userCheck = null;
       if (emailResult?.role === "instructor" || emailResult?.role === "admin") {
         userCheck = false;
-      }
-      else {
+      } else {
         userCheck = true;
       }
       const query = { status: "accept" };
       const result = await classCollection.find(query).toArray();
       res.send({ result, userCheck });
+    });
+
+    //--------------------------
+    //    check user role
+    //--------------------------
+
+    app.post("/check-user-role", async (req, res) => {
+      const email = req.body.email;
+      if (email) {
+        const emailQuery = { email: email };
+        const emailResult = await usersCollection.findOne(emailQuery);
+        res.send({ role: emailResult?.role });
+      }
     });
 
     //--------------------------
