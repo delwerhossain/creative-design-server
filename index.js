@@ -173,6 +173,14 @@ async function run() {
         res.send(result);
       }
     );
+
+  app.delete("/class/:id", verifyJWT, verifyInstructor, async (req, res) => {
+    const id = req.params.id;
+    console.log(id);
+    const query = { _id: new ObjectId(id) };
+    const result = await classCollection.deleteOne(query);
+    res.send(result);
+  });
     //--------------------------
     //    public api all class
     //--------------------------
