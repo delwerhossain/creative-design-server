@@ -179,16 +179,11 @@ async function run() {
     //--------------------------
     //    public api all class
     //--------------------------
-     app.get(
-       "/all-class",
-       verifyJWT,
-       async (req, res) => {
-         const result = await classCollection.find().toArray();
-         res.send(result);
-       }
-     );
-
-    
+    app.get("/all-class", async (req, res) => {
+      const query = { status: "accept" };
+      const result = await classCollection.find(query).toArray();
+      res.send(result);
+    });
 
     //--------------------------
     //        api ends
