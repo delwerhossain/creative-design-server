@@ -170,12 +170,25 @@ async function run() {
       verifyInstructor,
       async (req, res) => {
         const email = req.decoded.email;
-        console.log(email);
         const query = { instructorEmail: email };
         const result = await classCollection.find(query).toArray();
         res.send(result);
       }
     );
+
+    //--------------------------
+    //    public api all class
+    //--------------------------
+     app.get(
+       "/all-class",
+       verifyJWT,
+       async (req, res) => {
+         const result = await classCollection.find().toArray();
+         res.send(result);
+       }
+     );
+
+    
 
     //--------------------------
     //        api ends
