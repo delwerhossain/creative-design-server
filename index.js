@@ -179,10 +179,22 @@ async function run() {
     //--------------------------
     //    public api all class
     //--------------------------
-    app.get("/all-class", async (req, res) => {
+    app.post("/all-class", async (req, res) => {
+      const email = req.body.mail;
+      // get user role for  add to cart  btn show
+      const emailQuery = { email: email };
+      const emailResult = await usersCollection.findOne(emailQuery);
+      let userCheck = null;
+      if (emailResult?.role === "instructor" || emailResult?.role === "admin") {
+        userCheck = false;
+      }
+      else {
+        userCheck = true;
+      }
       const query = { status: "accept" };
       const result = await classCollection.find(query).toArray();
-      res.send(result);
+      console.log({ result, userCheck });
+      res.send({ result, userCheck });
     });
 
     //--------------------------
