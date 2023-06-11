@@ -144,6 +144,32 @@ async function run() {
     //        Instructor
     //--------------------------
 
+    // class collection apis
+    // app.get("/class", verifyJWT ,verifyInstructor, async (req, res) => {
+    //   const email = req.query.email;
+
+    //   if (!email) {
+    //     res.send([]);
+    //   }
+
+    //   const decodedEmail = req.decoded.email;
+    //   if (email !== decodedEmail) {
+    //     return res
+    //       .status(403)
+    //       .send({ error: true, message: "forbidden access" });
+    //   }
+
+    //   const query = { email: email };
+    //   const result = await cartCollection.find(query).toArray();
+    //   res.send(result);
+    // });
+
+    // app.post("/carts", async (req, res) => {
+    //   const item = req.body;
+    //   const result = await cartCollection.insertOne(item);
+    //   res.send(result);
+    // });
+
     //instructor verification for dashboard
     app.get("/users/instructor/:email", verifyJWT, async (req, res) => {
       const email = req.params.email;
@@ -165,11 +191,33 @@ async function run() {
     });
 
     // class update details
-    app.put("/update-class", verifyJWT, verifyInstructor, async (req, res) => {
-      const classDetails = req.body;
-      const result = await classCollection.insertOne(classDetails);
-      res.send(result);
-    });
+    app.put(
+      "/update-class/:id",
+      verifyJWT,
+      verifyInstructor,
+      async (req, res) => {
+        const id = req.params.id;
+        console.log(id, req.body);
+        const { name, pictureURL, subCategory, price, availableQuantity } =
+          req.body.classData;
+        
+        const filter = { _id: new ObjectId(id) };
+        const update = {
+          $set: {
+            name,
+            pictureURL,
+            subCategory,
+            price,
+            availableQuantity,
+          },
+        };
+        const options = { upsert: false };
+
+        const result = await classCollection.updateOne(filter, update, options);
+
+        res.send(result);
+      }
+    );
 
     // all class instructor
     app.get(
@@ -191,7 +239,6 @@ async function run() {
       const result = await classCollection.deleteOne(query);
       res.send(result);
     });
-
 
     //--------------------------
     //     student api
