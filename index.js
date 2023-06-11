@@ -280,8 +280,17 @@ async function run() {
 
     app.post("/carts", async (req, res) => {
       const item = req.body.cartItem;
-      const result = await cartCollection.insertOne(item);
-      res.send(result);
+      const findCart = await cartCollection.findOne({
+        classId: item?.classId,
+        email: item?.email,
+      });
+      if (!findCart) {
+        const result = await cartCollection.insertOne(item);
+        res.send(result);
+        console.log(result);
+      } else {
+        res.send("already added");
+      }
     });
 
     app.delete("/carts/:id", async (req, res) => {
@@ -291,9 +300,25 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/addedCartCheck/:id", verifyJWT, async (req, res) => {
+      const id = req.params.id;
+      const email = req.decoded.email;
+      console.log(email);
+      const findCart = await cartCollection.findOne({
+        classId: id,
+        email: email,
+      });
+      if (findCart) {
+        res.send(false);
+      } else {
+        res.send(true);
+      }
+    });
+
     //--------------------------
     //    public api all class
     //--------------------------
+
     app.get("/all-class", async (req, res) => {
       const result = await cartCollection.find().toArray();
       res.send(result);
