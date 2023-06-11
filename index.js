@@ -147,6 +147,16 @@ async function run() {
     });
 
     //--------------------------
+    //        admin
+    //--------------------------
+
+    // all class for admin
+    app.get("/class", verifyJWT, verifyAdmin, async (req, res) => {
+      const result = await classCollection.find().toArray();
+      res.send(result);
+    });
+
+    //--------------------------
     //        Instructor
     //--------------------------
 
