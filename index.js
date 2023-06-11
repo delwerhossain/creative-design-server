@@ -38,7 +38,7 @@ const verifyJWT = (req, res, next) => {
 };
 
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@simple-del.4ijtj0g.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.db_user}:${process.env.db_pass}@simple-del.4ijtj0g.mongodb.net/?retryWrites=true&w=majority`;
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -284,6 +284,11 @@ async function run() {
     //--------------------------
     //    public api all class
     //--------------------------
+    app.get("/all-class", async (req, res) => {
+      const result = await cartCollection.find().toArray();
+      res.send(result);
+    });
+
     app.post("/all-class", async (req, res) => {
       const email = req.body.mail;
       // get user role for  add to cart  btn show
