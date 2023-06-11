@@ -197,7 +197,6 @@ async function run() {
       verifyInstructor,
       async (req, res) => {
         const id = req.params.id;
-        console.log(id, req.body);
         const { name, pictureURL, subCategory, price, availableQuantity } =
           req.body.classData;
 
@@ -234,7 +233,6 @@ async function run() {
 
     app.delete("/class/:id", verifyJWT, verifyInstructor, async (req, res) => {
       const id = req.params.id;
-      console.log(id);
       const query = { _id: new ObjectId(id) };
       const result = await classCollection.deleteOne(query);
       res.send(result);
@@ -266,7 +264,6 @@ async function run() {
 
     app.post("/carts", async (req, res) => {
       const item = req.body.cartItem;
-      console.log(item);
       const result = await cartCollection.insertOne(item);
       res.send(result);
     });
@@ -306,11 +303,15 @@ async function run() {
     //--------------------------
 
     app.post("/check-user-role", async (req, res) => {
-      const email = req.body.email;
+      const email = req.body?.email;
       if (email) {
         const emailQuery = { email: email };
         const emailResult = await usersCollection.findOne(emailQuery);
-        res.send({ role: emailResult?.role });
+        if (emailResult) {
+          res.send({ role: emailResult?.role });
+        }
+      } else {
+        res.send({ role: null });
       }
     });
 
