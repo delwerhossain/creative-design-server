@@ -299,6 +299,12 @@ async function run() {
       res.send(result);
     });
 
+    app.get("/all-instructor", async (req, res) => {
+      const query = { role: "instructor" };
+      const result = await usersCollection.find(query).toArray();
+      res.send(result);
+    });
+
     app.post("/all-class", async (req, res) => {
       const email = req.body.mail;
       // get user role for  add to cart  btn show
