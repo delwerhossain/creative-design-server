@@ -287,9 +287,13 @@ async function run() {
       const emailQuery = { email: email };
       const emailResult = await usersCollection.findOne(emailQuery);
       let userCheck = null;
-      if (emailResult?.role === "instructor" || emailResult?.role === "admin") {
+      if (emailResult?.role === "instructor") {
         userCheck = false;
-      } else {
+      } else if (emailResult?.role === "admin") {
+        userCheck = false;
+      } else if (emailResult?.role === "student") {
+        userCheck = true;
+      } else if (emailResult?.role === null) {
         userCheck = true;
       }
       const query = { status: "accept" };
