@@ -200,7 +200,7 @@ async function run() {
         console.log(id, req.body);
         const { name, pictureURL, subCategory, price, availableQuantity } =
           req.body.classData;
-        
+
         const filter = { _id: new ObjectId(id) };
         const update = {
           $set: {
@@ -265,7 +265,8 @@ async function run() {
     });
 
     app.post("/carts", async (req, res) => {
-      const item = req.body;
+      const item = req.body.cartItem;
+      console.log(item);
       const result = await cartCollection.insertOne(item);
       res.send(result);
     });
