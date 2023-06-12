@@ -58,7 +58,9 @@ async function run() {
     const usersCollection = client.db("creative-design").collection("users");
     const classCollection = client.db("creative-design").collection("class");
     const cartCollection = client.db("creative-design").collection("carts");
-
+    const paymentCollection = client
+      .db("creative-design")
+      .collection("payments");
     //--------------------------
     //     Verification JWT
     //--------------------------
@@ -287,7 +289,6 @@ async function run() {
       if (!findCart) {
         const result = await cartCollection.insertOne(item);
         res.send(result);
-        console.log(result);
       } else {
         res.send("already added");
       }
@@ -303,7 +304,6 @@ async function run() {
     app.get("/addedCartCheck/:id", verifyJWT, async (req, res) => {
       const id = req.params.id;
       const email = req.decoded.email;
-      console.log(email);
       const findCart = await cartCollection.findOne({
         classId: id,
         email: email,
@@ -320,7 +320,8 @@ async function run() {
     //--------------------------
 
     app.get("/all-class", async (req, res) => {
-      const result = await cartCollection.find().toArray();
+      const query = { status: "accept" };
+      const result = await classCollection.find(query).toArray();
       res.send(result);
     });
 
@@ -365,6 +366,66 @@ async function run() {
       } else {
         res.send({ role: null });
       }
+    });
+
+    //--------------------------
+    //       Payment api
+    //--------------------------
+
+    // create payment intent
+    app.post("/create-payment-intent", verifyJWT, async (req, res) => {
+      const { price } = req.body;
+      const amount = parseInt(price * 100);
+      const paymentIntent = await stripe.paymentIntents.create({
+        amount: amount,
+        currency: "usd",
+        payment_method_types: ["card"],
+      });
+
+      res.send({
+        clientSecret: paymentIntent.client_secret,
+      });
+    });
+
+    // payment related api
+    app.post("/payments", verifyJWT, async (req, res) => {
+      const payment = req.body;
+      const insertResult = await paymentCollection.insertOne(payment);
+
+      const query = {
+        _id: { $in: payment.cartItems.map((id) => new ObjectId(id)) },
+      };
+      const deleteResult = await cartCollection.deleteMany(query);
+
+      res.send({ insertResult, deleteResult });
+    });
+
+    app.get("/admin-stats", verifyJWT, verifyAdmin, async (req, res) => {
+      const users = await usersCollection.estimatedDocumentCount();
+      const products = await menuCollection.estimatedDocumentCount();
+      const orders = await paymentCollection.estimatedDocumentCount();
+
+      // best way to get sum of the price field is to use group and sum operator
+      /*
+        await paymentCollection.aggregate([
+          {
+            $group: {
+              _id: null,
+              total: { $sum: '$price' }
+            }
+          }
+        ]).toArray()
+      */
+
+      const payments = await paymentCollection.find().toArray();
+      const revenue = payments.reduce((sum, payment) => sum + payment.price, 0);
+
+      res.send({
+        revenue,
+        users,
+        products,
+        orders,
+      });
     });
 
     //--------------------------
