@@ -372,6 +372,27 @@ async function run() {
     //       Payment api
     //--------------------------
 
+    // user get payment history
+    app.get("/payment-history", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+
+      if (!email) {
+        res.send([]);
+      }
+
+      const decodedEmail = req.decoded.email;
+      if (email !== decodedEmail) {
+        return res
+          .status(403)
+          .send({ error: true, message: "forbidden access" });
+      }
+
+      const emailQuery = { email: email };
+      const result = await paymentCollection.find(emailQuery).toArray();
+      res.send(result);
+      console.log(result);
+    });
+
     // create payment intent
     app.post("/create-payment-intent", verifyJWT, async (req, res) => {
       const { price } = req.body;
@@ -401,7 +422,6 @@ async function run() {
     });
 
     // user payment check
-    app.get("/pa");
 
     app.get("/admin-stats", verifyJWT, verifyAdmin, async (req, res) => {
       const users = await usersCollection.estimatedDocumentCount();
