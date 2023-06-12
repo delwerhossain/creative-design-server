@@ -301,9 +301,10 @@ async function run() {
       res.send(result);
     });
 
-    app.get("/addedCartCheck/:id", verifyJWT, async (req, res) => {
+    app.get("/addedCartCheck/:id", async (req, res) => {
       const id = req.params.id;
-      const email = req.decoded.email;
+      const email = req.query.email;
+      console.log(email);
       const findCart = await cartCollection.findOne({
         classId: id,
         email: email,
