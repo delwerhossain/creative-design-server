@@ -390,7 +390,6 @@ async function run() {
       const emailQuery = { email: email };
       const result = await paymentCollection.find(emailQuery).toArray();
       res.send(result);
-      console.log(result);
     });
 
     // create payment intent
@@ -472,12 +471,21 @@ async function run() {
 
       const emailQuery = { email: email };
       const payResult = await paymentCollection.find(emailQuery).toArray();
-      const allClassId = payResult[0].ClassID;
+      // console.log(payResult);
+
+      const allClassIds = [];
+
+      payResult.forEach((item) => {
+        const classIds = item.ClassID;
+        allClassIds.push(...classIds);
+      });
+console.log(allClassIds);
       const query = {
-        _id: { $in: allClassId.map((id) => new ObjectId(id)) },
+        _id: { $in: allClassIds.map((id) => new ObjectId(id)) },
       };
       const result = await classCollection.find(query).toArray();
       res.send(result);
+      // console.log(result);
     });
     //--------------------------
     //        api ends
