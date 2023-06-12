@@ -393,7 +393,7 @@ async function run() {
       const insertResult = await paymentCollection.insertOne(payment);
 
       const query = {
-        _id: { $in: payment.cartItems.map((id) => new ObjectId(id)) },
+        _id: { $in: payment.cartID.map((id) => new ObjectId(id)) },
       };
       const deleteResult = await cartCollection.deleteMany(query);
 
@@ -402,7 +402,7 @@ async function run() {
 
     app.get("/admin-stats", verifyJWT, verifyAdmin, async (req, res) => {
       const users = await usersCollection.estimatedDocumentCount();
-      const products = await menuCollection.estimatedDocumentCount();
+      const products = await classCollection.estimatedDocumentCount();
       const orders = await paymentCollection.estimatedDocumentCount();
 
       // best way to get sum of the price field is to use group and sum operator
