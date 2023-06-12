@@ -400,6 +400,9 @@ async function run() {
       res.send({ insertResult, deleteResult });
     });
 
+    // user payment check
+    app.get("/pa");
+
     app.get("/admin-stats", verifyJWT, verifyAdmin, async (req, res) => {
       const users = await usersCollection.estimatedDocumentCount();
       const products = await classCollection.estimatedDocumentCount();
@@ -428,6 +431,34 @@ async function run() {
       });
     });
 
+    //--------------------------
+    //        enrolled api
+    //--------------------------
+
+    // enrolled collection apis
+    app.get("/enrolled", verifyJWT, async (req, res) => {
+      const email = req.query.email;
+
+      if (!email) {
+        res.send([]);
+      }
+
+      const decodedEmail = req.decoded.email;
+      if (email !== decodedEmail) {
+        return res
+          .status(403)
+          .send({ error: true, message: "forbidden access" });
+      }
+
+      const emailQuery = { email: email };
+      const payResult = await paymentCollection.find(emailQuery).toArray();
+      const allClassId = payResult[0].ClassID;
+      const query = {
+        _id: { $in: allClassId.map((id) => new ObjectId(id)) },
+      };
+      const result = await classCollection.find(query).toArray();
+      res.send(result);
+    });
     //--------------------------
     //        api ends
     //--------------------------
