@@ -1,6 +1,6 @@
 ﻿## Live Link
 
-# Hosted in Firebase ->  https://creative-design-school.web.app/
+## Hosted in Firebase ->  https://creative-design-school.web.app/
 
 
 ## Client code link
